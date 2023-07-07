@@ -32,6 +32,11 @@ public class OccuperDAO {
             requeteSql = con.prepareStatement(sql);
             requeteSql.setInt(1,m.getIdReserve());
             requeteSql.executeUpdate();
+            sql = "INSERT INTO solde (idReserve,soldeactuel) VALUES (?,((SELECT MAX(soldeActuel) FROM solde )+ (Select (c.prixNuit*r.nbrJour) from chambre c,reserver r where r.idReserve = ? and r.numChambr = c.numChambr)))";
+            requeteSql = con.prepareStatement(sql);
+            requeteSql.setInt(1,m.getIdReserve());
+            requeteSql.setInt(2,m.getIdReserve());
+            requeteSql.executeUpdate();
             JOptionPane.showMessageDialog(null , "Ajouter avec Success");
             
         } catch (SQLException ex) {
@@ -67,6 +72,23 @@ public class OccuperDAO {
         try{
             con = cn.dbConnection();
             String sql = "SELECT idOccup FROM occuper";
+            requeteSql = con.prepareStatement(sql);
+            resultat = requeteSql.executeQuery();            
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(Occuper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(OccuperDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return resultat;
+    }
+    public ResultSet ListerIdReserve(){
+        try{
+            con = cn.dbConnection();
+            String sql = "SELECT idreserve from reserver WHERE idReserve NOT IN (SELECT idReserve from occuper)";
             requeteSql = con.prepareStatement(sql);
             resultat = requeteSql.executeQuery();            
         }

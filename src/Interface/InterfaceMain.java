@@ -2133,8 +2133,8 @@ public class InterfaceMain extends javax.swing.JFrame {
         idSoldeEdit.setModel(newModel);
     }
     public void refreshComboBoxModelOccuperReservation(){
-        idReserveOccuper.setModel(new javax.swing.DefaultComboBoxModel<>(getIdReservation()));
-        idReserveOccupModifier.setModel(new javax.swing.DefaultComboBoxModel<>(getIdReservation()));
+        idReserveOccuper.setModel(new javax.swing.DefaultComboBoxModel<>(getIdOccuperReserv()));
+        idReserveOccupModifier.setModel(new javax.swing.DefaultComboBoxModel<>(getIdOccuperReserv()));
     }
     public void refreshComboBoxModelChambre(){
         String[] updatedId = getIdChambre();
@@ -2339,6 +2339,7 @@ public class InterfaceMain extends javax.swing.JFrame {
     private void TableValueOccuper(){
         try{
             refreshComboBoxModelOccuper();
+            refreshComboBoxModelOccuperReservation();
             OccuperDAO occuperDAO = new OccuperDAO();
             ResultSet resultat = occuperDAO.Lister();
             DefaultTableModel model = (DefaultTableModel) afficheOccuper.getModel();
@@ -2389,7 +2390,7 @@ public class InterfaceMain extends javax.swing.JFrame {
     public String[] getIdOccuperReserv(){
         Occuper occuper = new Occuper();
         OccuperDAO occuperDAO = new OccuperDAO();
-        ResultSet resultat = occuperDAO.ListerId();
+        ResultSet resultat = occuperDAO.ListerIdReserve();
         try {
             ResultSetMetaData RSMD = resultat.getMetaData();
             int taille = RSMD.getColumnCount();
@@ -3016,6 +3017,8 @@ public class InterfaceMain extends javax.swing.JFrame {
         reservation.setNomClient(nomClient);
         sejourDAO.Enregistrer(reservation);
         TableValueSejour();
+        TableValue();
+        TableValueOccuper();
         refreshComboBoxModelSejour();
         nomClientAjoutSejour.setText(null);
         mailAjoutSejour.setText(null);
@@ -3147,6 +3150,7 @@ public class InterfaceMain extends javax.swing.JFrame {
         occuper.setIdReserve(idReserve);
         occuperDAO.Enregistrer(occuper);
         TableValueOccuper();
+        TableValue();
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void idOccupModifierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idOccupModifierActionPerformed

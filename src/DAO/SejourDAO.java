@@ -28,14 +28,26 @@ public class SejourDAO {
         boolean succes = true;
         try {
             con = cn.dbConnection();
-            String sql = "INSERT INTO reserver (numChambr,nbrJour,nomClient,telephone) VALUES (?,?,?,?)";
+            String sql = "INSERT INTO reserver (numChambr,nbrJour,nomClient,telephone) VALUES (?,?,?,?) RETURNING idReserve";
             requeteSql = con.prepareStatement(sql);
             requeteSql.setString(1,m.getNumChambr());
             requeteSql.setInt(2, m.getNbrJour());
             requeteSql.setString(3,m.getNomClient());
             requeteSql.setString(4,m.getTelephone());
-            requeteSql.executeUpdate();
+            ResultSet resultSet = requeteSql.executeQuery();
             JOptionPane.showMessageDialog(null , "Ajouter avec Success");
+            if (resultSet.next()) {
+                int dernierID = resultSet.getInt("idReserve");
+                String sql1 = "INSERT INTO solde (idReserve,soldeactuel) VALUES (?,((SELECT MAX(soldeActuel) FROM solde )+ (Select (c.prixNuit*r.nbrJour) from chambre c,reserver r where r.idReserve = ? and r.numChambr = c.numChambr)))";
+                requeteSql = con.prepareStatement(sql1);
+                requeteSql.setInt(1, dernierID);
+                requeteSql.setInt(2, dernierID);
+                requeteSql.executeUpdate();
+                String sql2 = "INSERT INTO occuper (idReserve) VALUES (?)";
+                requeteSql = con.prepareStatement(sql2);
+                requeteSql.setInt(1,dernierID);
+                requeteSql.executeUpdate();
+            }
             
         } catch (SQLException ex) {
             Logger.getLogger(Reserver.class.getName()).log(Level.SEVERE, null, ex);
